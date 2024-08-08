@@ -1,0 +1,324 @@
+paths:
+  /shippingAddress:
+     post:
+      security:
+        - bearerAuth: []
+      tags: 
+        - ShippingAddress
+      summary: Add new shippingAddress.
+      operationId: addNewShippingAddress
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/AddShippingAddressReqObj"
+      responses:
+        200:
+          description: Add new shippingAddress.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    exaple: 200
+                  response:
+                    type: String
+                    example: success
+                  msg:
+                    type: String
+                    example: ShippingAddress has been added.
+                  shippingAddressId:
+                    type: integer
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Error"
+     get:
+      security:
+        - bearerAuth: []
+      summary: Find and retrive all shippingAddress.
+      operationId: fetchAllShippingAddress
+      tags:
+        - ShippingAddress
+      parameters:
+        - in: query
+          name: include
+          description: To fetch all the associations.
+          required: false
+          schema:
+            type: string
+            example: all
+      responses:
+        200:
+          description: ShippingAddress-List
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/ShippingAddressList"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Error"
+  /shippingAddress/{shippingAddressId}:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Find and retrive specific shippingAddress.
+      operationId: fetchSpecificShippingAddressData
+      tags:
+       - ShippingAddress
+      parameters:
+        - in: path
+          name: shippingAddressId
+          description: ShippingAddress-ID to fetch specific shippingAddress data with the associations.
+          required: true
+          schema:
+            type: string
+            example: 1
+        - in: query
+          name: include
+          description: To fetch all the associations.
+          required: false
+          schema:
+            type: string
+            example: all
+      responses:
+        200:
+          description: ShippingAddress-Data
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/ShippingAddressData"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Error"
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - ShippingAddress
+      summary: Update an existing shippingAddress data.
+      operationId: updateShippingAddressData
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: shippingAddressId
+          description: ShippingAddress-ID
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/AddShippingAddressReqObj"
+      responses:
+        200:
+          description: Update shippingAddress data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  response:
+                    type: string
+                    example: success
+                  msg:
+                    type: string
+                    example: ShippingAddress data updated successfully. 
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Error"
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+       - ShippingAddress
+      summary: Delete ShippingAddress Record.
+      operationId: deleteShippingAddressRecord
+      parameters:
+        - in: path
+          name: shippingAddressId
+          description: ID_ShippingAddress(shippingAddressId)
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: Delete shippingAddress Record.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/definitions/successRes"
+                  - $ref: "#/definitions/invalidRes"
+                  - $ref: "#/definitions/errorRes"
+              examples:
+                success:
+                  summary: Example of successful response.
+                  value:
+                    status: 200
+                    response: success
+                    msg: ShippingAddress has been deleted successfully.
+                invalidId:
+                  summary: Example of invalid response.
+                  value:
+                    status: 401
+                    response: validationerror
+                    msg: Invalid operation.
+                error:
+                  summary: Example of error response.
+                  value:
+                    status: 400
+                    responses: error
+                    msg: Some thing went wrong.
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Error"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+definitions:
+  ShippingAddressData:
+    type: object
+    properties:
+      status:
+        type: integer
+        example: 200
+      response:
+        type: string
+        example: success
+      ShippingAddress:
+        type: object
+        properties:
+          shippingAddressId:
+            type: integer
+          address:
+            type: string
+          pinCode:
+            type: string
+  AddShippingAddressReqObj:
+    type: object
+    properties:
+          address:
+            type: string
+          pinCode:
+            type: string
+  ShippingAddressObj:
+    type: array
+    items:
+      type: object
+      properties:
+          shippingAddressId:
+            type: integer
+          address:
+            type: string
+          pinCode:
+            type: string
+  ShippingAddressList:
+    type: object
+    properties:
+      status:
+        type: integer
+        example: 200
+      response:
+        type: string
+        example: success
+      ShippingAddress:
+        $ref: "#/definitions/ShippingAddressObj"
+  Error:
+    type: object
+    required:
+      - status
+      - response
+    properties:
+      status:
+        type: integer
+        example: 400
+      response:
+        type: string
+        example: error
+      msg:
+        type: string
+        example: Some thing went wrong.
+      error:
+        type: object
+        properties:
+          name:
+            type: string
+          errors:
+            type: array
+            items:
+              type: object
+              properties:
+                message:
+                  type: string
+  successRes:
+    type: object
+    required:
+      - status
+      - response
+    properties:
+      status:
+        type: integer
+        example: 200
+      response:
+        type: string
+        example: success
+      msg:
+        type: string
+        example: ShippingAddress has been deleted successfully.
+  invalidRes:
+    type: object
+    required:
+      - status
+      - response
+    properties:
+      status:
+        type: integer
+        example: 400
+      response:
+        type: string
+        example: invailid
+      msg:
+        type: string
+        example: Invailid AdvisorID.
+  errorRes:
+    type: object
+    required:
+      - status
+      - response
+    properties:
+      status:
+        type: integer
+        example: 500
+      response:
+        type: string
+        rxample: error
+      msg:
+        type: string
+        example: Some thing went wrong.

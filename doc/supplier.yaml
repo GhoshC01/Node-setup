@@ -1,0 +1,324 @@
+paths:
+  /supplier:
+     post:
+      security:
+        - bearerAuth: []
+      tags: 
+        - Supplier
+      summary: Add new supplier.
+      operationId: addNewSupplier
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/AddSupplierReqObj"
+      responses:
+        200:
+          description: Add new supplier.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    exaple: 200
+                  response:
+                    type: String
+                    example: success
+                  msg:
+                    type: String
+                    example: Supplier has been added.
+                  supplierId:
+                    type: integer
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Error"
+     get:
+      security:
+        - bearerAuth: []
+      summary: Find and retrive all supplier.
+      operationId: fetchAllSupplier
+      tags:
+        - Supplier
+      parameters:
+        - in: query
+          name: include
+          description: To fetch all the associations.
+          required: false
+          schema:
+            type: string
+            example: all
+      responses:
+        200:
+          description: Supplier-List
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/SupplierList"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Error"
+  /supplier/{supplierId}:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Find and retrive specific supplier.
+      operationId: fetchSpecificSupplierData
+      tags:
+       - Supplier
+      parameters:
+        - in: path
+          name: supplierId
+          description: Supplier-ID to fetch specific supplier data with the associations.
+          required: true
+          schema:
+            type: string
+            example: 1
+        - in: query
+          name: include
+          description: To fetch all the associations.
+          required: false
+          schema:
+            type: string
+            example: all
+      responses:
+        200:
+          description: Supplier-Data
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/SupplierData"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Error"
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Supplier
+      summary: Update an existing Supplier data.
+      operationId: updateSupplierData
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: supplierId
+          description: Supplier-ID
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/AddSupplierReqObj"
+      responses:
+        200:
+          description: Update supplier data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  response:
+                    type: string
+                    example: success
+                  msg:
+                    type: string
+                    example: Supplier data updated successfully. 
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Error"
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+       - Supplier
+      summary: Delete Supplier Record.
+      operationId: deleteSupplierRecord
+      parameters:
+        - in: path
+          name: supplierId
+          description: ID_Supplier(supplierId)
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: Delete supplier Record.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/definitions/successRes"
+                  - $ref: "#/definitions/invalidRes"
+                  - $ref: "#/definitions/errorRes"
+              examples:
+                success:
+                  summary: Example of successful response.
+                  value:
+                    status: 200
+                    response: success
+                    msg: Supplier has been deleted successfully.
+                invalidId:
+                  summary: Example of invalid response.
+                  value:
+                    status: 401
+                    response: validationerror
+                    msg: Invalid operation.
+                error:
+                  summary: Example of error response.
+                  value:
+                    status: 400
+                    responses: error
+                    msg: Some thing went wrong.
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Error"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+definitions:
+  SupplierData:
+    type: object
+    properties:
+      status:
+        type: integer
+        example: 200
+      response:
+        type: string
+        example: success
+      Supplier:
+        type: object
+        properties:
+          supplierId:
+            type: integer
+          name:
+            type: string
+          contact:
+            type: string
+  AddSupplierReqObj:
+    type: object
+    properties:
+      name:
+        type: string
+      contact:
+        type: string
+  SupplierObj:
+    type: array
+    items:
+      type: object
+      properties:
+        supplierId:
+          type: integer
+        name:
+          type: string
+        contact:
+          type: string
+  SupplierList:
+    type: object
+    properties:
+      status:
+        type: integer
+        example: 200
+      response:
+        type: string
+        example: success
+      supplier:
+        $ref: "#/definitions/SupplierObj"
+  Error:
+    type: object
+    required:
+      - status
+      - response
+    properties:
+      status:
+        type: integer
+        example: 400
+      response:
+        type: string
+        example: error
+      msg:
+        type: string
+        example: Some thing went wrong.
+      error:
+        type: object
+        properties:
+          name:
+            type: string
+          errors:
+            type: array
+            items:
+              type: object
+              properties:
+                message:
+                  type: string
+  successRes:
+    type: object
+    required:
+      - status
+      - response
+    properties:
+      status:
+        type: integer
+        example: 200
+      response:
+        type: string
+        example: success
+      msg:
+        type: string
+        example: Supplier has been deleted successfully.
+  invalidRes:
+    type: object
+    required:
+      - status
+      - response
+    properties:
+      status:
+        type: integer
+        example: 400
+      response:
+        type: string
+        example: invailid
+      msg:
+        type: string
+        example: Invailid AdvisorID.
+  errorRes:
+    type: object
+    required:
+      - status
+      - response
+    properties:
+      status:
+        type: integer
+        example: 500
+      response:
+        type: string
+        rxample: error
+      msg:
+        type: string
+        example: Some thing went wrong.
